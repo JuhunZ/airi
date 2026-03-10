@@ -200,7 +200,7 @@ export function buildOpenAICompatibleProvider(
               baseURL: baseUrl,
               headers: additionalHeaders,
               model,
-              messages: message.messages(message.user('ping')),
+              messages: message.messages(message.user([message.textPart('ping')])),
               max_tokens: 1,
             })
             return null

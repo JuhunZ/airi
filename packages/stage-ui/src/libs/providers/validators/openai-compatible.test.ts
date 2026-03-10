@@ -74,4 +74,30 @@ describe('createOpenAICompatibleValidators', () => {
     expect(chatResult.valid).toBe(true)
     expect(generateTextMock).not.toHaveBeenCalled()
   })
+
+  it('probes chat completions with text content parts for stricter OpenAI-compatible APIs', async () => {
+    listModelsMock.mockResolvedValue([{ id: 'test-model' }])
+    generateTextMock.mockResolvedValue({ text: 'pong' })
+
+    const [connectivityValidator] = getProviderValidators({
+      checks: ['connectivity'],
+    })
+
+    const connectivityResult = await connectivityValidator.validator(config, provider as any, undefined as any, undefined as any)
+
+    expect(connectivityResult.valid).toBe(true)
+    expect(generateTextMock).toHaveBeenCalledWith(expect.objectContaining({
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'ping',
+            },
+          ],
+        },
+      ],
+    }))
+  })
 })
